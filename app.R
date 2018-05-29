@@ -41,7 +41,7 @@ ui <- fluidPage(
 )
 
 # Define server logic
-max_plots <- 20
+# max_plots <- 20
 server <- shinyServer(function(input, output) {
   data1 <- reactive({
     if (!input$input_demo) req(input$input_csv)
@@ -75,7 +75,7 @@ server <- shinyServer(function(input, output) {
   })
 
   observeEvent(input$input_run, { 
-    output$plots <- renderUI({get_plot_output_list(max_plots, input$n)})
+    output$plots <- renderUI({get_plot_output_list(ncol(data1()), input$n)})
   })
   })
 
