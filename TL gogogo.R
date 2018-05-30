@@ -298,12 +298,13 @@ cts_summary <- function(x, gvar = NULL, digits = 3, graph_size = 10) {
   if (!is.null(gvar)) {
     dd_gmean <-  dd %>% 
       group_by_("gvar") %>% 
-      summarise(x = mean(x, na.rm=T))
+      summarise(x = mean(x, na.rm=T)) %>% 
+      mutate(label = paste0(gvar, ": ", round(x, digits)))
     
     cts_plot <- cts_plot + 
       geom_vline(data = dd_gmean, aes(xintercept = x), 
                  col = "red", linetype = 2) + 
-      facet_wrap(~gvar)
+      facet_wrap(~gvar, labeller = labeller(gvar = setNames(dd_gmean$label, dd_gmean$gvar)))
   }
   
   list(cts_table, cts_plot)

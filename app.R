@@ -10,35 +10,47 @@ source("TL gogogo.R") # utility functions
 
 # Define UI for application
 ui <- fluidPage(
-   
-   # Application title
-   titlePanel("tlsummary demo"),
-   h4("Tony Liu, June 2018"), 
-   
-   # Sidebar with options to update a dataframe (in csv)
-   sidebarLayout(
-      sidebarPanel(width = 4, 
-        # fileInput("input_csv", "upload csv file", width = "360px",
-        #           accept = c("text/csv","text/comma-separated-values,text/plain",".csv")), 
-        # actionButton("input_demo", "demo"), 
-        
-        div(style="display: inline-block;vertical-align:top;",
-            fileInput("input_csv", "upload csv file", width = "350px",
-                      accept = c("text/csv","text/comma-separated-values,text/plain",".csv"))), 
-        div(style="display: inline-block;vertical-align:top; padding-top: 26px;",
-            actionButton("input_run", "run", width = "70px")), 
-        div(style="display: inline-block;vertical-align:top; padding-top: 26px;",
-            actionButton("input_demo", "demo", width = "70px")), 
-        
-        uiOutput("ui_n"), 
-        uiOutput("ui_gvar")
-      ),
+  # css
+  tags$head(tags$style(
+    HTML('
+         #sidebar {
+         background-color: transparent;
+         border-color: transparent
+         }
+         
+         body, label, input, button, select { 
+         font-family: "Arial";
+         }')
+  )),
+
+ # Application title
+ titlePanel("tlsummary demo"),
+ h4("Tony Liu, June 2018"), 
+ 
+ # Sidebar with options to update a dataframe (in csv)
+ sidebarLayout(
+    sidebarPanel(id="sidebar", width = 4, 
+      # fileInput("input_csv", "upload csv file", width = "360px",
+      #           accept = c("text/csv","text/comma-separated-values,text/plain",".csv")), 
+      # actionButton("input_demo", "demo"), 
       
-      # Show a graph output from tlsummary
-      mainPanel(
-        uiOutput("plots") %>% withSpinner(type=1, color = DC[2])
-      )
-   )
+      div(style="display: inline-block;vertical-align:top;",
+          fileInput("input_csv", "upload csv file", width = "350px",
+                    accept = c("text/csv","text/comma-separated-values,text/plain",".csv"))), 
+      div(style="display: inline-block;vertical-align:top; padding-top: 26px;",
+          actionButton("input_run", "run", width = "70px")), 
+      div(style="display: inline-block;vertical-align:top; padding-top: 26px;",
+          actionButton("input_demo", "demo", width = "70px")), 
+      
+      uiOutput("ui_n"), 
+      uiOutput("ui_gvar")
+    ),
+    
+    # Show a graph output from tlsummary
+    mainPanel(
+      uiOutput("plots") %>% withSpinner(type=1, color = DC[2])
+    )
+ )
 )
 
 # Define server logic
