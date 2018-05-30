@@ -1,12 +1,12 @@
 name: tlsummary
 title: tlsummary
 username:
-account: tony-yanjun
+account: yanjun
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
-appId: 350453
-bundleId: 1398590
-url: https://tony-yanjun.shinyapps.io/tlsummary/
-when: 1527605790.53739
+appId: 350510
+bundleId: 1398489
+url: https://yanjun.shinyapps.io/tlsummary/
+when: 1527603309.15101
 asMultiple: FALSE
 asStatic: FALSE

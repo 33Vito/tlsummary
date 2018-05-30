@@ -276,12 +276,12 @@ ggring <- function(df, xvar, keySize = 6, textSize = 8.5) {
           legend.text = element_text(size = unit(textSize,"mm")))
 }
 
-cts_summary <- function(x, digits = 4, graph_size = 10) {
+cts_summary <- function(x, digits = 3, graph_size = 10) {
   
   cts_table <- tibble(key = c("Min", "1st_q", "Med", "3rd_q", "Max", "Mean", "Sd", 
-                              "Miss", "Obs"),
+                              "Miss", "Obs", "Distinct"),
                       value = c(fivenum(x, na.rm = T), mean(x, na.rm = T), sd(x, na.rm = T), 
-                                sum(is.na(x)), length(x))) %>% rdf(digits)
+                                sum(is.na(x)), length(x), n_distinct(x))) %>% rdf(digits)
   
   # suppressWarnings(
   #   cts_table_transpose <- cts_table %>%
