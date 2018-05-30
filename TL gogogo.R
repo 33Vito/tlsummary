@@ -276,82 +276,86 @@ ggring <- function(df, xvar, keySize = 6, textSize = 8.5) {
           legend.text = element_text(size = unit(textSize,"mm")))
 }
 
-cts_summary <- function(x, digits = 3, graph_size = 10) {
+cts_summary <- function(x, gvar = NULL, digits = 3, graph_size = 10) {
   
+  if (!is.null(gvar) & length(x) != length(gvar)) stop("length of x and grouping variable does not match")
+
   cts_table <- tibble(key = c("Min", "1st_q", "Med", "3rd_q", "Max", "Mean", "Sd", 
                               "Miss", "Obs", "Distinct"),
                       value = c(fivenum(x, na.rm = T), mean(x, na.rm = T), sd(x, na.rm = T), 
                                 sum(is.na(x)), length(x), n_distinct(x))) %>% rdf(digits)
+
+  if (!is.null(gvar)) dd <- tibble(x=x, gvar=gvar)
+  else dd <- tibble(x)
   
-  # suppressWarnings(
-  #   cts_table_transpose <- cts_table %>%
-  #     rownames_to_column %>%
-  #     gather(var, value,-rowname) %>% 
-  #     spread(rowname, value)
-  # )
-  
-  cts_plot <- ggplot(as_tibble(x), aes(x)) + 
+  cts_plot <- dd %>% 
+    ggplot(aes(x)) + 
     geom_histogram(col = "white", bins = 30) + 
     ggy(comma, "") + 
     ggx(comma, "") + 
     ggl(base_size = graph_size)
-  # theme(axis.text.y = element_blank())
   
-  # print(
-  # grid.arrange(
-  #   cts_plot,
-  #   tableGrob(cts_table, rows = NULL, cols = NULL, theme = ttheme_minimal(base_size = 10)),
-  # widths = c(2,1))
-  # )
+  if (!is.null(gvar)) {
+    dd_gmean <-  dd %>% 
+      group_by_("gvar") %>% 
+      summarise(x = mean(x, na.rm=T))
+    
+    cts_plot <- cts_plot + 
+      geom_vline(data = dd_gmean, aes(xintercept = x), 
+                 col = "red", linetype = 2) + 
+      facet_wrap(~gvar)
+  }
   
   list(cts_table, cts_plot)
 }
 
-# cts_summary(iris$Sepal.Length)
-# mm <- map(iris[,1:2], cts_summary)
-
-dst_summary <- function(x, graph_size = 10) {
+dst_summary <- function(x, gvar = NULL, graph_size = 10) {
   
-  dst_table <- table(x, useNA = "ifany") %>% data.frame() %>% setNames(c("Category", "Count")) %>% 
+  if (!is.null(gvar) & length(x) != length(gvar)) stop("length of x and grouping variable does not match")
+  
+  if (!is.null(gvar)) {
+    dd <- table(x, gvar, useNA = "ifany") %>% 
+      data.frame() %>% 
+      setNames(c("Category", "gvar", "Count"))
+  } else {
+    dd <- table(x, useNA = "ifany") %>% 
+      data.frame() %>% 
+      setNames(c("Category", "Count"))
+  }
+  
+  dst_table <-  dd %>% 
     mutate(Category = as.character(Category)) %>% 
     mutate(Category = ifelse(is.na(Category), "missing", Category)) %>% 
     mutate(Percent = paste0(round(100*Count/sum(Count), 1), "%")) %>% 
     arrange(-Count) %>% 
     mutate(Category = str_wrap(Category, 30))
   
-  # suppressWarnings(
-  #   dst_table_transpose <- dst_table %>%
-  #     top_n(5, Percent) %>% 
-  #     rownames_to_column %>%
-  #     gather(var, value,-rowname) %>% 
-  #     spread(rowname, value)
-  # )
-  
-  # browser()
   dst_plot <- ggplot(dst_table, aes(fct_relevel(reorder(Category, Count), "missing"), Count)) + 
     geom_col(col = "white") + 
     ggy(comma, "") + 
     xlab("") + 
     coord_flip() +
     ggl(base_size = graph_size) + 
-    # ggvxl2()
     theme(axis.text.y = element_text(size = unit(graph_size - 2, "cm")))
-  # theme(axis.text.y = element_blank())
+  
+  if (!is.null(gvar)) dst_plot <- dst_plot + facet_wrap(~gvar)
   
   list(dst_table, dst_plot)
 }
 
-tlsummary <- function(df, mode = 'graph', export = F, 
+tlsummary <- function(df, gvar = NULL, mode = 'graph', export = F, 
                       graph_size = 10, table_size = 9, table_padding = c(2.3, 1.8)) {
   # browser()
   cts_names <- names(df)[map_lgl(df, ~is.numeric(.x) | is.integer(.x))]
   dst_names <- names(df)[map_lgl(df, ~is.character(.x) | is.factor(.x))]
   df_names <- names(df)[names(df) %in% c(cts_names, dst_names)]
   
-  cts_plot_new <- suppressWarnings(map2(map(dplyr::select(df, cts_names), ~cts_summary(.x, graph_size = graph_size)[[2]]), 
+  cts_plot_new <- suppressWarnings(map2(map(dplyr::select(df, cts_names), 
+                                            ~cts_summary(.x, gvar = gvar, graph_size = graph_size)[[2]]), 
                                         str_wrap(cts_names, 80), ~.x + ggtitle(.y)))
   
-  dst_plot_new <- suppressWarnings(map2(map(dplyr::select(df, dst_names), ~dst_summary(.x, graph_size = graph_size)[[2]]), 
+  dst_plot_new <- suppressWarnings(map2(map(dplyr::select(df, dst_names),
+                                            ~dst_summary(.x, gvar = gvar, graph_size = graph_size)[[2]]), 
                                         str_wrap(dst_names, 80), ~.x + ggtitle(.y)))
   
   if (mode == 'graph') {
@@ -367,7 +371,6 @@ tlsummary <- function(df, mode = 'graph', export = F,
   } else if (mode == 'table') {
     c(map(dplyr::select(df, cts_names), ~cts_summary(.x)[[1]]), 
       map(dplyr::select(df, dst_names), ~dst_summary(.x)[[1]]))[df_names] %>% 
-      # map(~DT::datatable(.x, extensions = 'Buttons'))
       map(~pdf(.x, 2))
   } else {stop("mode must be either 'graph' or 'table'")}
   

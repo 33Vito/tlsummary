@@ -30,12 +30,13 @@ ui <- fluidPage(
         div(style="display: inline-block;vertical-align:top; padding-top: 26px;",
             actionButton("input_demo", "demo", width = "70px")), 
         
-        uiOutput("ui_n")
+        uiOutput("ui_n"), 
+        uiOutput("ui_gvar")
       ),
       
       # Show a graph output from tlsummary
       mainPanel(
-        uiOutput("plots")%>% withSpinner(type=1, color = DC[2])
+        uiOutput("plots") %>% withSpinner(type=1, color = DC[2])
       )
    )
 )
@@ -54,13 +55,18 @@ server <- shinyServer(function(input, output) {
     dd[,map_lgl(dd, ~is.numeric(.x) | is.integer(.x) | is.factor(.x) | is.character(.x))]
   })
   
+  gvar <- reactive({
+    if (input$gvar == "") NULL
+    else data1()[[input$gvar]]
+  })
+  
   get_plot_output_list <- function(max_plots, input_n) {
     # Insert plot output objects the list
     plot_output_list <- lapply(1:input_n, function(i) {
       plotname <- names(data1())[i]
       plot_output_object <- plotOutput(plotname)
       plot_output_object <- renderPlot({
-        tlsummary(data1()[, i, drop=F], graph_size = 15, table_size = 15, table_padding = c(4,4))
+        tlsummary(data1()[, i, drop=F], gvar = gvar(), graph_size = 15, table_size = 15, table_padding = c(4,4))
       })
     })
     
@@ -72,6 +78,13 @@ server <- shinyServer(function(input, output) {
   output$ui_n <- renderUI({
     if (!input$input_demo) req(input$input_csv)
     sliderInput("n", "Number of plots/variables to show: ", value=1, min=1, max=ncol(data1()), step = 1)
+  })
+  
+  output$ui_gvar <- renderUI({
+    selectInput("gvar", "Grouping variable: ", 
+                selected = NULL,
+                multiple = F, 
+                choices = c("", names(data1())[map_lgl(data1(), ~class(.x)[1] %in% c("ordered", "factor", "character"))]))
   })
 
   observeEvent(input$input_run, { 
