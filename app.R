@@ -3,7 +3,6 @@
 # You can run the application by clicking
 # the 'Run App' button above.
 
-options(browser = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe")
 
 library(shiny)
 library(shinycssloaders)
@@ -24,7 +23,7 @@ ui <- fluidPage(
         # actionButton("input_demo", "demo"), 
         
         div(style="display: inline-block;vertical-align:top;",
-            fileInput("input_csv", "upload csv file", width = "250px",
+            fileInput("input_csv", "upload csv file", width = "350px",
                       accept = c("text/csv","text/comma-separated-values,text/plain",".csv"))), 
         div(style="display: inline-block;vertical-align:top; padding-top: 26px;",
             actionButton("input_run", "run", width = "70px")), 
@@ -36,8 +35,7 @@ ui <- fluidPage(
       
       # Show a graph output from tlsummary
       mainPanel(
-        withSpinner(uiOutput("plots"), 
-                    type=1, color = DC[2])
+        uiOutput("plots")%>% withSpinner(type=1, color = DC[2])
       )
    )
 )
@@ -82,5 +80,5 @@ server <- shinyServer(function(input, output) {
   })
 
 # Run the application 
-runApp(list(ui = ui, server = server), launch.browser = TRUE)
-
+# runApp(ui = ui, server = server, launch.browser = "chrome")
+shinyApp(ui = ui, server = server)
