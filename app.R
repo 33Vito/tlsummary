@@ -78,7 +78,7 @@ server <- shinyServer(function(input, output) {
       plotname <- names(data1())[i]
       plot_output_object <- plotOutput(plotname)
       plot_output_object <- renderPlot({
-        tlsummary(data1()[, i, drop=F], gvar = gvar(), graph_size = 15, table_size = 15, table_padding = c(4,4))
+        tlsummary(data1()[, i, drop=F], gvar = gvar(), graph_size = 13, table_size = 15, table_padding = c(4,4))
       })
     })
     
