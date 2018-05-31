@@ -72,6 +72,12 @@ server <- shinyServer(function(input, output) {
     else data1()[[input$gvar]]
   })
   
+  gvar_length <- reactive({
+    if (input$gvar == "") {
+      0
+    } else {n_distinct(gvar())}
+  })
+  
   get_plot_output_list <- function(max_plots, input_n) {
     # Insert plot output objects the list
     plot_output_list <- lapply(1:input_n, function(i) {
@@ -79,7 +85,7 @@ server <- shinyServer(function(input, output) {
       plot_output_object <- plotOutput(plotname)
       plot_output_object <- renderPlot({
         tlsummary(data1()[, i, drop=F], gvar = gvar(), graph_size = 13, table_size = 15, table_padding = c(4,4))
-      })
+      }, height = function() {300*(gvar_length() %/% 3 + 1) - 30*gvar_length()})
     })
     
     do.call(tagList, plot_output_list) # needed to display properly.

@@ -5,8 +5,8 @@ account: tony-yanjun
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 350453
-bundleId: 1400308
+bundleId: 1400447
 url: https://tony-yanjun.shinyapps.io/tlsummary/
-when: 1527681595.88375
+when: 1527686503.96151
 asMultiple: FALSE
 asStatic: FALSE
