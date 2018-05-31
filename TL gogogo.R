@@ -290,7 +290,7 @@ cts_summary <- function(x, gvar = NULL, digits = 3, graph_size = 10) {
   
   cts_plot <- dd %>% 
     ggplot(aes(x)) + 
-    geom_histogram(col = "white", bins = 30) + 
+    geom_histogram(col = "white", bins = 30, fill = "#A3A3A3") + 
     ggy(comma, "") + 
     ggx(comma, "") + 
     ggl(base_size = graph_size)
@@ -332,7 +332,7 @@ dst_summary <- function(x, gvar = NULL, graph_size = 10) {
     mutate(Category = str_wrap(Category, 30))
   
   dst_plot <- ggplot(dst_table, aes(fct_relevel(reorder(Category, Count), "missing"), Count)) + 
-    geom_col(col = "white") + 
+    geom_col(col = "white", fill = "#A3A3A3") + 
     ggy(comma, "") + 
     xlab("") + 
     coord_flip() +
