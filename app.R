@@ -34,6 +34,7 @@ ui <- fluidPage(
       #           accept = c("text/csv","text/comma-separated-values,text/plain",".csv")), 
       # actionButton("input_demo", "demo"), 
       
+      h5("Click `demo`, or upload your own csv data, then click `run`."), 
       div(style="display: inline-block;vertical-align:top;",
           fileInput("input_csv", "upload csv file", width = "300px",
                     accept = c("text/csv","text/comma-separated-values,text/plain",".csv"))), 
@@ -41,6 +42,9 @@ ui <- fluidPage(
           actionButton("input_run", "run", width = "70px")), 
       div(style="display: inline-block;vertical-align:top; padding-top: 26px;",
           actionButton("input_demo", "demo", width = "70px")), 
+
+      h5("Further input options will appear below to determine the number of plot/variables to show, 
+         and whether to use a grouping variable."),
       
       uiOutput("ui_n"), 
       uiOutput("ui_gvar")
