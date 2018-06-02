@@ -47,7 +47,8 @@ ui <- fluidPage(
          and whether to use a grouping variable."),
       
       uiOutput("ui_n"), 
-      uiOutput("ui_gvar")
+      uiOutput("ui_gvar"),
+      uiOutput("ui_cvar")
     ),
     
     # Show a graph output from tlsummary
@@ -69,8 +70,15 @@ server <- shinyServer(function(input, output) {
     else dd <- read_csv(inFile$datapath)
     
     dd[,map_lgl(dd, ~is.numeric(.x) | is.integer(.x) | is.factor(.x) | is.character(.x))]
+
   })
   
+  data2 <- reactive({
+    if (is.null(input$cvar)) data1() 
+    else if (input$cvar == "") data1()
+    else select(data1(), input$cvar, everything())
+  })
+
   gvar <- reactive({
     if (input$gvar == "") NULL
     else data1()[[input$gvar]]
@@ -88,8 +96,8 @@ server <- shinyServer(function(input, output) {
       plotname <- names(data1())[i]
       plot_output_object <- plotOutput(plotname)
       plot_output_object <- renderPlot({
-        tlsummary(data1()[, i, drop=F], gvar = gvar(), graph_size = 13, table_size = 15, table_padding = c(4,4))
-      }, height = function() {250*((gvar_length()-1) %/% 3 + 1) + 50*(ifelse(gvar_length() > 3, .5, 1))})
+        tlsummary(data2()[, i, drop=F], gvar = gvar(), graph_size = 13, table_size = 13, table_padding = c(4,4))
+      }, height = function() {230*((gvar_length()-1) %/% 3 + 1) + 60*(ifelse(gvar_length() > 3, .5, 1))})
     })
     
     do.call(tagList, plot_output_list) # needed to display properly.
@@ -104,9 +112,14 @@ server <- shinyServer(function(input, output) {
   
   output$ui_gvar <- renderUI({
     selectInput("gvar", "Grouping variable: ", 
-                selected = NULL,
                 multiple = F, 
                 choices = c("", names(data1())[map_lgl(data1(), ~class(.x)[1] %in% c("ordered", "factor", "character"))]))
+  })
+  
+  output$ui_cvar <- renderUI({
+    selectInput("cvar", "Choosing variable: (i.e. move to top)", 
+                multiple = F, 
+                choices = c("", names(data1())))
   })
 
   observeEvent(input$input_run, { 
