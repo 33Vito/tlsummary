@@ -78,7 +78,7 @@ server <- shinyServer(function(input, output) {
   
   gvar_length <- reactive({
     if (input$gvar == "") {
-      0
+      1
     } else {n_distinct(gvar())}
   })
   
@@ -89,7 +89,7 @@ server <- shinyServer(function(input, output) {
       plot_output_object <- plotOutput(plotname)
       plot_output_object <- renderPlot({
         tlsummary(data1()[, i, drop=F], gvar = gvar(), graph_size = 13, table_size = 15, table_padding = c(4,4))
-      }, height = function() {300*(gvar_length() %/% 3 + 1) - 30*gvar_length()})
+      }, height = function() {320*((gvar_length()-1) %/% 3 + 1) - 30*gvar_length()})
     })
     
     do.call(tagList, plot_output_list) # needed to display properly.
