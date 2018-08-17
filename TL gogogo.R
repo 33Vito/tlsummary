@@ -345,7 +345,7 @@ dst_summary <- function(x, gvar = NULL, graph_size = 10) {
 }
 
 tlsummary <- function(df, gvar = NULL, mode = 'graph', export = F, 
-                      graph_size = 10, table_size = 9, table_padding = c(2.3, 1.8)) {
+                      graph_size = 10, table_size = 8, table_padding = c(2.3, 1.8)) {
   # browser()
   cts_names <- names(df)[map_lgl(df, ~is.numeric(.x) | is.integer(.x))]
   dst_names <- names(df)[map_lgl(df, ~is.character(.x) | is.factor(.x))]

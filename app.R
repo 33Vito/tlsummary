@@ -3,6 +3,7 @@
 # You can run the application by clicking
 # the 'Run App' button above.
 
+options(shiny.maxRequestSize=100*1024^2) 
 
 library(shiny)
 library(shinycssloaders)
