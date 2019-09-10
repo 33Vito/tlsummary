@@ -37,7 +37,7 @@ ui <- fluidPage(
       
       h5("Click `demo`, or upload your own csv data, then click `run`."), 
       div(style="display: inline-block;vertical-align:top;",
-          fileInput("input_csv", "upload csv file", width = "300px",
+          fileInput("input_csv", "upload csv file", width = "200px",
                     accept = c("text/csv","text/comma-separated-values,text/plain",".csv"))), 
       div(style="display: inline-block;vertical-align:top; padding-top: 26px;",
           actionButton("input_run", "run", width = "70px")), 
